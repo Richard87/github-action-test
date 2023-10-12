@@ -27,7 +27,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config user.name "${{github.event.actor.display_login}}"
+          git config user.name "${{github.event.actor.login}} <from-workflow-dispatch>"
           git config user.email github-actions@github.com
           echo Publishing ${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
           

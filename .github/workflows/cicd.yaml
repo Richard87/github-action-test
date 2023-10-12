@@ -38,5 +38,5 @@ jobs:
           git push
           git tag v${{inputs.major}}
           git tag v${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
-          git push origin v${{inputs.major}}
-          git push origin v${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
+          git push origin v${{inputs.major}} --force
+          git push origin v${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}} --force

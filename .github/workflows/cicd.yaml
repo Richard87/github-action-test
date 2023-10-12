@@ -3,16 +3,10 @@ name: CD
 on:
   workflow_dispatch:
     inputs:
-      major:
+      semver:
         required: true
-        default: 1
-        type: number
-      minor:
-        required: true
-        type: number
-      patch:
-        required: true
-        type: number
+        default: "1.9.3"
+        type: string
 
 permissions:
   contents: write
@@ -25,18 +19,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Parse SemVer
+        id: semver
+        run: |
+          VERSION="${{inputs.semver}}"
+          VERSION="${VERSION#[vV]}"
+          VERSION_MAJOR="${VERSION%%\.*}"
+          VERSION_MINOR="${VERSION#*.}"
+          VERSION_MINOR="${VERSION_MINOR%.*}"
+          VERSION_PATCH="${VERSION##*.}"
+
+          echo "Version: ${VERSION}"
+          echo "Version [major]: ${VERSION_MAJOR}"
+          echo "Version [minor]: ${VERSION_MINOR}"
+          echo "Version [patch]: ${VERSION_PATCH}"
+  
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "major=${VERSION_MAJOR}" >> "$GITHUB_OUTPUT"
+          echo "minor=${VERSION_MINOR}" >> "$GITHUB_OUTPUT"
+          echo "patch=${VERSION_PATCH}" >> "$GITHUB_OUTPUT"
+
       - name: Commit and push changes
         run: |
           git config user.name "${{github.event.actor.login}} <from-workflow-dispatch>"
           git config user.email github-actions@github.com
           echo Publishing ${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
           
-          sed -i 's/ARG RX_VERSION=.*/ARG RX_VERSION="${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}"/' Dockerfile
+          sed -i 's/ARG RX_VERSION=.*/ARG RX_VERSION="${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}"/' Dockerfile
           
           git add Dockerfile
-          git commit -m "Updating radix-cli to v${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}"
+          git commit -m "Updating radix-cli to v${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}"
           git push
-          git tag v${{inputs.major}}
-          git tag v${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
-          git push origin v${{inputs.major}} --force
-          git push origin v${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
+          git tag v${{steps.semver.outputs.major}}
+          git tag v${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}
+          git push origin v${{steps.semver.outputs.major}} --force
+          git push origin v${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}

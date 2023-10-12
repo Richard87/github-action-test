@@ -1,4 +1,4 @@
-ARG RX_VERSION="new_version"
+ARG RX_VERSION="{{inputs.major}}.{{inputs.minor}}.{{inputs.patch}}"
 FROM ghcr.io/equinor/radix/rx:${RX_VERSION} as builder
 
 FROM alpine:3.18

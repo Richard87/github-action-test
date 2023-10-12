@@ -27,15 +27,15 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          echo Publishing {{inputs.major}}.{{inputs.minor}}.{{inputs.patch}}
-          sed -i 's/ARG RX_VERSION=.*/ARG RX_VERSION="{{inputs.major}}.{{inputs.minor}}.{{inputs.patch}}"/' Dockerfile
+          echo Publishing ${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
+          sed -i 's/ARG RX_VERSION=.*/ARG RX_VERSION="${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}"/' Dockerfile
           
           git config --global user.name "{{event.actor.display_login}}"
           
           git add -A
-          git commit -m "Updating radix-cli to v{{inputs.major}}.{{inputs.minor}}.{{inputs.patch}}"
+          git commit -m "Updating radix-cli to v${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}"
           git push
-          git tag v{{inputs.major}}
-          git tag v{{inputs.major}}.{{inputs.minor}}.{{inputs.patch}}
-          git push origin v{{inputs.major}}
-          git push origin v{{inputs.major}}.{{inputs.minor}}.{{inputs.patch}}
+          git tag v${{inputs.major}}
+          git tag v${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
+          git push origin v${{inputs.major}}
+          git push origin v${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}

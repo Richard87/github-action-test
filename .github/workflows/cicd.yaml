@@ -30,7 +30,7 @@ jobs:
           echo Publishing ${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
           sed -i 's/ARG RX_VERSION=.*/ARG RX_VERSION="${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}"/' Dockerfile
           
-          git config --global user.name "{{event.actor.display_login}}"
+          git config --global user.name "${{event.actor.display_login}}"
           
           git add -A
           git commit -m "Updating radix-cli to v${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}"

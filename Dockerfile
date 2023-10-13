@@ -1,5 +1,5 @@
 # The RX_VERSION is parsed by ci.yaml and cd.yaml, validate any changes there
-ARG RX_VERSION="1.9.9"
+ARG RX_VERSION="1.0.2"
 FROM ghcr.io/equinor/radix/rx:${RX_VERSION} as builder
 
 FROM alpine:3.18

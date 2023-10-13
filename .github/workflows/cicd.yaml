@@ -16,8 +16,6 @@ jobs:
     name: Modifiy repository files
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Parse SemVer
         id: semver
@@ -38,6 +36,19 @@ jobs:
           echo "major=${VERSION_MAJOR}" >> "$GITHUB_OUTPUT"
           echo "minor=${VERSION_MINOR}" >> "$GITHUB_OUTPUT"
           echo "patch=${VERSION_PATCH}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate semver
+        run: |
+          pattern="^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[^+]+)?(?:\+[^+]+)?$"
+          match = $SEMVER =~ $patern
+          echo $match
+          
+          exit 1
+        env:
+        - SEMVER: ${{steps.semver.outputs.version}}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Commit and push changes
         run: |

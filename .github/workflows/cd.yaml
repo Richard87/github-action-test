@@ -53,7 +53,7 @@ jobs:
         env:
           SEMVER: ${{steps.semver.outputs.version}}
 
-      - name: Commit and push changes
+      - name: Tag new versions from Dockerfile
         run: |
           git config user.name "${{github.event.actor.login}} <from-workflow-dispatch>"
           git config user.email github-actions@github.com

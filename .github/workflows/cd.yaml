@@ -18,13 +18,15 @@ jobs:
 
       - name: Read RX-Version
         id: read
-        run: grep 'ARG RX_VERSION=' Dockerfile | awk -F '"' '{print $2}'
+        run: |
+          version=$(grep 'ARG RX_VERSION=' Dockerfile | awk -F '"' '{print $2}')
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
 
       # Copied from https://gist.github.com/bitmvr/9ed42e1cc2aac799b123de9fdc59b016
       - name: Parse SemVer
         id: semver
         run: |
-          VERSION="${{steps.read.results}}"
+          VERSION="${{steps.read.outputs.version}}"
           VERSION="${VERSION#[vV]}"
           VERSION_MAJOR="${VERSION%%\.*}"
           VERSION_MINOR="${VERSION#*.}"

@@ -13,10 +13,12 @@ jobs:
     name: Modifiy repository files
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Read RX-Version
         id: read
         run: grep 'ARG RX_VERSION=' Dockerfile | awk -F '"' '{print $2}'
-
 
       # Copied from https://gist.github.com/bitmvr/9ed42e1cc2aac799b123de9fdc59b016
       - name: Parse SemVer
@@ -48,9 +50,6 @@ jobs:
           exit 1
         env:
           SEMVER: ${{steps.semver.outputs.version}}
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Commit and push changes
         run: |

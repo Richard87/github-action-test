@@ -40,8 +40,7 @@ jobs:
       - name: Validate semver
         run: |
           pattern="^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[^+]+)?(?:\+[^+]+)?$"
-          match=$SEMVER =~ $patern
-          echo $match
+          if [[ $SEMVER =~ $pattern ]]; then exit 2; fi;
           
           exit 1
         env:

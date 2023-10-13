@@ -1,4 +1,4 @@
-name: CD
+name: CI
 
 on:
   workflow_dispatch:
@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   deploy:
@@ -39,9 +40,7 @@ jobs:
 
       - name: Validate semver
         run: |
-          echo "Version: $SEMVER"
-            pattern="^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$"
-            echo $pattern
+            echo "Version: $SEMVER"
             if [[ $SEMVER =~ ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$ ]]; then echo "success" && exit 0; fi;
             
             echo "failed"
@@ -52,18 +51,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Commit and push changes
+      - name: Update Dockerfile
         run: |
-          git config user.name "${{github.event.actor.login}} <from-workflow-dispatch>"
-          git config user.email github-actions@github.com
-          echo Publishing ${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
-          
           sed -i 's/ARG RX_VERSION=.*/ARG RX_VERSION="${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}"/' Dockerfile
-          
-          git add Dockerfile
-          git commit -m "Updating radix-cli to v${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}"
-          git push
-          git tag v${{steps.semver.outputs.major}}
-          git tag v${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}
-          git push origin v${{steps.semver.outputs.major}} --force
-          git push origin v${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          delete-branch: true
+          title: Update Action with Radix-Cli ${{steps.semver.outputs.version}}

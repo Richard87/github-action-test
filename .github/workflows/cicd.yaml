@@ -39,6 +39,7 @@ jobs:
 
       - name: Validate semver
         run: |
+          echo "Version: ${SEMBER}"
           pattern="^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[^+]+)?(?:\+[^+]+)?$"
           if [[ $SEMVER =~ $pattern ]]; then exit 2; fi;
           

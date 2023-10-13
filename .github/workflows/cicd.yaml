@@ -45,7 +45,7 @@ jobs:
           
           exit 1
         env:
-        - SEMVER: ${{steps.semver.outputs.version}}
+          SEMVER: ${{steps.semver.outputs.version}}
 
       - name: Checkout repository
         uses: actions/checkout@v4

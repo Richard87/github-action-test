@@ -39,11 +39,13 @@ jobs:
 
       - name: Validate semver
         run: |
-          echo "Version: ${SEMBER}"
-          pattern="^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[^+]+)?(?:\+[^+]+)?$"
-          if [[ $SEMVER =~ $pattern ]]; then exit 2; fi;
-          
-          exit 1
+          echo "Version: $SEMVER"
+            pattern="^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$"
+            echo $pattern
+            if [[ $SEMVER =~ ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$ ]]; then echo "success" && exit 2; fi;
+            
+            echo "failed"
+            exit 1
         env:
           SEMVER: ${{steps.semver.outputs.version}}
 

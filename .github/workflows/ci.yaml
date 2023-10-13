@@ -60,3 +60,4 @@ jobs:
         with:
           delete-branch: true
           title: Update Action with Radix-Cli ${{steps.semver.outputs.version}}
+          reviewers: ${{ github.actor }}

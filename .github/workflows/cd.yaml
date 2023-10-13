@@ -13,12 +13,16 @@ jobs:
     name: Modifiy repository files
     runs-on: ubuntu-latest
     steps:
+      - name: Read RX-Version
+        id: read
+        run: grep 'ARG RX_VERSION=' Dockerfile | awk -F '"' '{print $2}'
+
 
       # Copied from https://gist.github.com/bitmvr/9ed42e1cc2aac799b123de9fdc59b016
       - name: Parse SemVer
         id: semver
         run: |
-          VERSION="${{inputs.semver}}"
+          VERSION="${{steps.read.results}}"
           VERSION="${VERSION#[vV]}"
           VERSION_MAJOR="${VERSION%%\.*}"
           VERSION_MINOR="${VERSION#*.}"
@@ -48,24 +52,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Update Dockerfile
-        run: |
-          sed -i 's/ARG RX_VERSION=.*/ARG RX_VERSION="${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}"/' Dockerfile
-
-
       - name: Commit and push changes
         run: |
           git config user.name "${{github.event.actor.login}} <from-workflow-dispatch>"
           git config user.email github-actions@github.com
           echo Publishing ${{inputs.major}}.${{inputs.minor}}.${{inputs.patch}}
           
-          git add Dockerfile
-          git commit -m "Updating radix-cli to v${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}"
-          git push
           git tag v${{steps.semver.outputs.major}}
           git tag v${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}
           git push origin v${{steps.semver.outputs.major}} --force
           git push origin v${{steps.semver.outputs.major}}.${{steps.semver.outputs.minor}}.${{steps.semver.outputs.patch}}
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
